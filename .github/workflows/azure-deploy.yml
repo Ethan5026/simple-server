@@ -47,3 +47,4 @@ jobs:
         app-name: 'simple-server' 
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}  # The publish profile
         images: 'simpleserverregistry.azurecr.io/simple-server:latest'  # The image from ACR
+        app-settings: 'WEBSITES_PORT=3000'  # Azure will now forward traffic to port 3000
