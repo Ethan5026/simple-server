@@ -26,7 +26,7 @@ jobs:
 
     # Step 3: Build and Push Docker image with Docker Compose
     - run: |
-        docker-compose -f .docker/docker-compose.yml up --build
+        docker-compose -f .docker/docker-compose.yml build
         docker-compose -f .docker/docker-compose.yml push   # Push to ACR
 
     # Step 4: Deploy Docker image to Azure Web App
