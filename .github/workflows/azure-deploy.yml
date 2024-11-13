@@ -1,6 +1,9 @@
 name: Linux Container Node Workflow
 
-on: [push]
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ["master"]
 
 jobs:
   build:
@@ -8,15 +11,16 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
     - uses: azure/docker-login@v1
       with:
-        login-server: simpleserverregistry.azurecr.io
+        login-server: mycontainer.azurecr.io
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
+
     - run: |
         docker build . -t simpleserverregistry.azurecr.io/simple-server:${{ github.sha }}
-        docker push simpleserverregistry.azurecr.io/simple-server:${{ github.sha }}
-
+        docker push simpleserverregistry.azurecr.io/simple-server:${{ github.sha }}     
 
     - uses: azure/webapps-deploy@v2
       with:
