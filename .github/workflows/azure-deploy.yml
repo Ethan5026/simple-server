@@ -1,4 +1,4 @@
-name: Linux Container Node Workflow
+name: Azure Deployment Container
 
 on:
   # Runs on pushes targeting the default branch
@@ -12,16 +12,25 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    # Step 1: Log in to Azure Container Registry (ACR)
     - uses: azure/docker-login@v1
       with:
         login-server: mycontainer.azurecr.io
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
 
+    # Step 2: Set up Docker Compose (if not already installed)
     - run: |
-        docker build . -t simpleserverregistry.azurecr.io/simple-server:${{ github.sha }}
-        docker push simpleserverregistry.azurecr.io/simple-server:${{ github.sha }}     
+        sudo curl -L https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+        sudo chmod +x /usr/local/bin/docker-compose
+        docker-compose --version
 
+    # Step 3: Build and push Docker image using docker-compose
+    - run: |
+        docker-compose -f .docker/docker-compose.yml build  # Build the container as defined in docker-compose.yml
+        docker-compose -f .docker/docker-compose.yml push   # Push to ACR
+
+    # Step 4: Deploy the Docker container to Azure Web App
     - uses: azure/webapps-deploy@v2
       with:
         app-name: 'simple-server'
