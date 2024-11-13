@@ -47,13 +47,3 @@ jobs:
         app-name: 'simple-server' 
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}  # The publish profile
         images: 'simpleserverregistry.azurecr.io/simple-server:latest'  # The image from ACR
-
-    # Step 6: Set Application Settings (such as WEBSITE_PORT)
-    - uses: azure/cli@v1
-      with:
-        azcliversion: '2.36.0'
-        inlineScript: |
-          az webapp config appsettings set \
-            --name simple-server \
-            --resource-group simple-server \
-            --settings WEBSITE_PORT=3000
