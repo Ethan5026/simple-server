@@ -1,4 +1,4 @@
-name: Linux Container Node Workflow
+name: Azure Container Deployment
 
 on:
   push:
@@ -18,12 +18,18 @@ jobs:
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
 
-    # Step 2: Build and Push Docker image with Docker Compose
+    # Step 2: Set up Docker Compose (if not already installed)
+    - run: |
+        sudo curl -L https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+        sudo chmod +x /usr/local/bin/docker-compose
+        docker-compose --version
+
+    # Step 3: Build and Push Docker image with Docker Compose
     - run: |
         docker-compose -f .docker/docker-compose.yml build  # Adjust path to docker-compose if necessary
         docker-compose -f .docker/docker-compose.yml push   # Push to ACR
 
-    # Step 3: Deploy Docker image to Azure Web App
+    # Step 4: Deploy Docker image to Azure Web App
     - uses: azure/webapps-deploy@v2
       with:
         app-name: 'simple-server'  # Your Azure Web App's name
