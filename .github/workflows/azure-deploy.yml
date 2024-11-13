@@ -27,6 +27,7 @@ jobs:
     # Step 3: Build Docker image with Docker Compose
     - run: |
         docker-compose -f .docker/docker-compose.yml build
+        docker images  # List images to confirm the build is successful
 
     # Step 4: Tag and Push Docker image with unique sha and latest tag
     - run: |
