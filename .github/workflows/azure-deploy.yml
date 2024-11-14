@@ -46,4 +46,4 @@ jobs:
       with:
         app-name: 'simple-server' 
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}  # The publish profile
-        images: 'simpleserverregistry.azurecr.io/simple-server:latest'  # The image from ACR
+        images: 'simpleserverregistry.azurecr.io/simple-server:latest'  # The image from ACR #
