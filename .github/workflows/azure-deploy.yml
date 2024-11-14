@@ -26,7 +26,7 @@ jobs:
 
     # Step 3: Build Docker image with Docker Compose
     - run: |
-        docker-compose -f .docker/docker-compose.yml up --build -d
+        docker-compose -f .docker/docker-compose.yml build
         docker ps  # List images to confirm the build is successful. You'll use the 'latest' build below to tag for your ACR and Web APplication
 
     - run: |
