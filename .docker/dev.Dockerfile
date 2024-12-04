@@ -29,3 +29,6 @@ COPY . .
 RUN gem install bundler -v $BUNDLE_VERSION
 RUN bundle install
 RUN yarn install
+
+# Default command to run the Rails server
+CMD ["bash", "-c", "rm -f tmp/pids/server.pid && bundle exec rake db:setup && bundle exec rails s -p 3000 -b '0.0.0.0'"]
