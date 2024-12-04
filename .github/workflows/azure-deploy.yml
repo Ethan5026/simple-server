@@ -1,6 +1,8 @@
-name: Linux Container Node Workflow
+name: Azure Container Deployment
 
-on: [push]
+on:
+  push:
+    branches: ["master"]
 
 jobs:
   build:
@@ -8,18 +10,39 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
+    # Step 1: Log in to Azure Container Registry (ACR)
     - uses: azure/docker-login@v1
       with:
-        login-server: simpleserverregistry.azurecr.io
+        login-server: simpleserverrepository.azurecr.io
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
+
+    # Step 2: Set up Docker Compose (if not already installed)
     - run: |
-        docker build . -t simpleserverregistry.azurecr.io/simple-server:${{ github.sha }}
-        docker push simpleserverregistry.azurecr.io/simple-server:${{ github.sha }}
+        sudo curl -L https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+        sudo chmod +x /usr/local/bin/docker-compose
+        docker-compose --version
+    # Step 3: Build Docker image with Docker Compose
+    - run: |
+        docker-compose -f .docker/docker-compose.yml build
+        docker ps  # List images to confirm the build is successful. You'll use the 'latest' build below to tag for your ACR and Web APplication
 
 
+    # Step 4: Tag and Push Docker images with unique sha and latest tag
+    - run: |
+        # Tag the image with the sha
+        docker tag docker_server:latest simpleserverrepository.azurecr.io/simple-server:${{ github.sha }}
+        # Tag the image with the latest tag
+        docker tag docker_server:latest simpleserverrepository.azurecr.io/simple-server:latest
+
+        # Push both the sha and latest tags
+        docker push simpleserverrepository.azurecr.io/simple-server:${{ github.sha }}
+        docker push simpleserverrepository.azurecr.io/simple-server:latest
+
+        
+    # Step 5: Deploy Docker images to Azure Web App
     - uses: azure/webapps-deploy@v2
       with:
-        app-name: 'simple-server'
+        app-name: 'SimpleServerApp' 
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-        images: 'simpleserverregistry.azurecr.io/simple-server:${{ github.sha }}'
